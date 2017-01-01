@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>geo game</title>
+<style type="text/css">
+*{
+    margin:0px;
+    padding:0px;
+}
+body, button, input, select, textarea {
+    font: 12px/16px Verdana, Helvetica, Arial, sans-serif;
+}
+p{
+    width:603px;
+    padding-top:3px;
+    overflow:hidden;
+}
+
+.btn{
+    width:100px;
+    height:26px
+}
+#container{
+  min-width:600px;
+  min-height:767px;
+  }
+</style>
+<script charset="utf-8" src="http://map.qq.com/api/js?v=2.exp&libraries=geometry"></script>
+<script>
+var map, geocoder, clickLoc, trueLoc, checkDistance, exit, checkRightAns;
+var geoArray = ['上海', '北京', '商洛', '西安', '石家庄', '张家口', '承德', '唐山', '秦皇岛', '廊坊', '保定', '沧州', '衡水', '邢台', '邯郸市', '太原', '大同', '朔州', '忻州', '阳泉', '晋中', '吕梁', '长治', '临汾', '晋城', '运城市', '合肥', '淮北', '亳州', '宿州', '蚌埠', '阜阳', '淮南', '滁州', '六安', '马鞍山', '芜湖', '宣城', '铜陵', '池州', '安庆', '黄山', '济南', '德州', '滨州', '东营', '烟台', '威海', '威海', '淄博', '潍坊', '聊城', '泰安', '莱芜', '青岛', '日照', '济宁', '菏泽', '临沂', '枣庄'];
+var count;
+function init() {
+    map = new qq.maps.Map(document.getElementById("container"), {    
+    
+    /*
+        MapTypeId的显示类型
+        ROADMAP	该地图类型显示普通的街道地图。
+        SATELLITE	该地图类型显示卫星图像。
+        HYBRID	该地图类型显示卫星图像上的主要街道透明层。
+
+    */
+
+    //通过mapTypeId来设置卫星地图样式
+        mapTypeId:qq.maps.MapTypeId.SATELLITE,
+        //宇宙中心
+        center: new qq.maps.LatLng(39.916527,116.397128),
+        zoomLevel:14
+    });
+
+    //点击增加标志
+    qq.maps.event.addListener(map, 'click', function(event) {
+       var marker=new qq.maps.Marker({
+                position:event.latLng, 
+                map:map
+          });    
+      qq.maps.event.addListener(map, 'click', function(event) {
+            marker.setMap(null);      
+    });
+    });
+
+    geocoder = new qq.maps.Geocoder({
+        complete : function(result){
+            var tmp = result.detail.location;
+            trueLoc = [tmp.getLng(), tmp.getLat()];
+            console.log("true location" + trueLoc);
+            var start = new qq.maps.LatLng(clickLoc[1], clickLoc[0]);
+            var end = new qq.maps.LatLng(trueLoc[1], trueLoc[0]);
+            var dis = Math.round(qq.maps.geometry.spherical.computeDistanceBetween(start, end)*10)/10;
+            document.getElementById("distance").innerHTML = "your click point is " +　dis + "meters from " + geoArray[count];  
+            count = count + 1;
+            if (count >= geoArray.length)
+                restart();
+            else
+                document.getElementById("res").innerHTML = geoArray[count]; 
+            }
+    });
+
+    //点击绑定
+    qq.maps.event.addListener(map, 'click', function(event) {
+        //geocoder.getLocation("上海");
+        //console.log(event);
+        clickLoc = [event.latLng.getLng(), event.latLng.getLat()];
+        console.log(clickLoc);
+        
+    });
+
+    checkDistance = function(geoNameNow) {
+        geocoder.getLocation(geoNameNow);
+
+    }
+
+    exit = function () {
+        alert("close the browser by yourself, don\'t count on me");
+    }
+
+    restart = function () {
+        
+        var len = geoArray.length;
+        for(var i = 0; i < len - 1; i++){
+        var idx = Math.floor(Math.random() * (len - i));
+        var temp = geoArray[idx];
+        geoArray[idx] = geoArray[len - i - 1];
+        geoArray[len - i -1] = temp;
+        }
+        count = 0;
+        document.getElementById("res").innerHTML = geoArray[0];
+    }
+
+    check = function () {
+        //var tmp = init();
+        geocoder.getLocation(geoArray[count]);
+        //checkDistance(geoArray[count]);
+        /*
+        count = count + 1;
+        if (count >= geoArray.length)
+            restart();
+        else
+            document.getElementById("res").innerHTML = geoArray[count];*/
+    }
+
+    checkRightAns = function() {
+        var marker=new qq.maps.Marker({
+                position:new qq.maps.LatLng(trueLoc[1], trueLoc[0]),
+                map:map
+        });  
+        qq.maps.event.addListener(map, 'click', function(event) {
+            marker.setMap(null);  
+        });
+
+    }
+
+}
+
+</script>
+</head>
+<body onload="init();">
+<div id="container"></div>
+<button onclick="restart()">start</button>
+<button onclick="check()">check</button>
+<button onclick="exit()">exit</button>
+<button onclick="checkRightAns()">right location</button><br>
+<span id="res"></span><br>
+<span id="distance"></span><br>
+
+</body>
+</html>
