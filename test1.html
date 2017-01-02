@@ -72,7 +72,7 @@ function init() {
     */
 
     //通过mapTypeId来设置卫星地图样式
-        //mapTypeId:qq.maps.MapTypeId.SATELLITE,
+        mapTypeId:qq.maps.MapTypeId.SATELLITE,
         //宇宙中心
         center: new qq.maps.LatLng(39.916527,116.397128),
         zoomLevel:14
@@ -111,7 +111,7 @@ function init() {
             else
                 document.getElementById("res").innerHTML = "next city is " + geoArray[count]; 
             console.log(count);
-            if (count%2 == 0)
+            if (count%10 == 0)
                 alert("your average score is " + Math.round(grade*10/count)/10 + "!\nyou are such a smart ass!!" + "\ncarry on!!");
             clickLoc = [];
             }
