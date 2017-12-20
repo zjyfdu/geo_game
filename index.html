@@ -4,19 +4,26 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>geo game</title>
-    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
 <style type="text/css">
 #container{
-  min-width:300px;
-  min-height:540px;
+    min-width:300px;
+    min-height:540px;
+    border: 1px solid grey;
+    border-radius: 4px;
 }
 #info{
     border: 1px solid grey;
-    min-height: 120px;
+    min-height: 130px;
     border-radius: 4px;
+    margin-bottom: 20px;
+    margin-top: 20px;
 }
 #info p{
-    margin-bottom: 5px;
+    margin-bottom: 1px;
+}
+#info #buttons, #info #describe{
+    margin: 10px;
 }
 </style>
 <script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&libraries=geometry"></script>
@@ -29,9 +36,11 @@ function init() {
     map = new qq.maps.Map(document.getElementById("container"), {
 
     //通过mapTypeId来设置卫星地图样式
-        mapTypeId:qq.maps.MapTypeId.HYBRID,
+        mapTypeId:qq.maps.MapTypeId.LANDFORM,
         center: new qq.maps.LatLng(39.916527,116.397128),
-        zoomLevel:14
+        zoomLevel:14,
+        panControl: false,
+        draggableCursor: "crosshair"
     });
 
     //点击增加标志
@@ -41,7 +50,6 @@ function init() {
                 map:map
           });
         clickLoc = [event.latLng.getLng(), event.latLng.getLat()];
-        console.log(clickLoc);
 
       qq.maps.event.addListener(map, 'click', function(event) {
             marker.setMap(null);
@@ -53,7 +61,6 @@ function init() {
         complete : function(result){
             var tmp = result.detail.location;
             trueLoc = [tmp.getLng(), tmp.getLat()];
-            console.log("true location" + trueLoc);
             var start = new qq.maps.LatLng(clickLoc[1], clickLoc[0]);
             var end = new qq.maps.LatLng(trueLoc[1], trueLoc[0]);
             var dis = Math.round(qq.maps.geometry.spherical.computeDistanceBetween(start, end)/1000);
@@ -63,17 +70,17 @@ function init() {
                 grade += 5;
             else if (dis <= 200)
                 grade += 2;
-            document.getElementById("distance").innerHTML = "your click point is " +　dis + " km from " + geoArray[count];
-            document.getElementById("grade").innerHTML = "you got " + grade + " points";
+            document.getElementById("distance").innerHTML = "你的答案偏离" + geoArray[count] +　dis + " 千米" ;
+            document.getElementById("grade").innerHTML = "累计获得" + grade + "分";
             count = count + 1;
             if (count >= geoArray.length)
                 restart();
             else
-                document.getElementById("res").innerHTML = "click " + geoArray[count] + " on map";
-            console.log(count);
+                document.getElementById("res").innerHTML = "在地图上点击" + geoArray[count];
             if (count%10 == 0)
-                alert("your average score is " + Math.round(grade*10/count)/10 + "!\nyou are such a smart ass!!" + "\ncarry on!!");
+                alert("你的平均分是" + Math.round(grade*10/count)/10 + "!\nyou are such a smart ass!!" + "\n加油！！");
             clickLoc = [];
+            checkRightAns();
             }
     });
 
@@ -88,35 +95,28 @@ function init() {
             geoArray[len - i -1] = temp;
         }
         count = 0;
-        document.getElementById("res").innerHTML = "click " + geoArray[count] + " on map and then check your ans";
+        document.getElementById("res").innerHTML = "在地图上标注" + geoArray[count] + "，然后确认";
     }
 
     check = function () {
 
         if (clickLoc.length == 0)
-            alert("click the location of " + geoArray[count] + " before you check your answer");
+            alert("请先点击" + geoArray[count]);
         else{
             geocoder.getLocation(geoArray[count]);
-            checkRightAns();
         }
 
     }
 
     checkRightAns = function() {
-        if (clickLoc.length == 0)
-            alert("click the location of " + geoArray[count] + " before you check the right answer");
-        else{
-            var marker=new qq.maps.Marker({
-                    position:new qq.maps.LatLng(trueLoc[1], trueLoc[0]),
-                    map:map
-            });
-            qq.maps.event.addListener(map, 'click', function(event) {
-                marker.setMap(null);
-            });
-        }
-
+        var marker=new qq.maps.Marker({
+                position:new qq.maps.LatLng(trueLoc[1], trueLoc[0]),
+                map:map
+        });
+        qq.maps.event.addListener(map, 'click', function(event) {
+            marker.setMap(null);
+        });
     }
-
 }
 
 </script>
@@ -124,13 +124,15 @@ function init() {
 <body onload="init();">
 <div class="container">
     <div id="info">
-        <div onclick="restart()" class="btn btn-primary">start</div>
-        <div onclick="check()" class="btn btn-primary">check</div><br>
-        <!--<div onclick="checkRightAns()" class="btn btn-danger">right location</div>-->
-        <!--<button onclick="exit()">exit</button><br>-->
+        <div id="buttons">
+        <div onclick="restart()" class="btn btn-primary">开始</div>
+        <div onclick="check()" class="btn btn-primary">确认</div><br>
+        </div>
+        <div id="describe">
         <p id="res"></p>
         <p id="distance"></p>
         <p id="grade"></p>
+        </div>
     </div>
     <div id="container"></div>
 
