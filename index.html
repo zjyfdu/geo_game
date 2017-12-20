@@ -5,13 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>geo game</title>
 <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+
 <style type="text/css">
-#container{
-    min-width:300px;
-    min-height:540px;
-    border: 1px solid grey;
+html,body {
+    margin:0;
+    padding:0;
+    height:100%; /* needed for container min-height */
+}
+
+.container {
+    height: 100%;
+}
+
+div#container {
+
+    height:auto !important; /* real browsers */
+    height:100%; /* IE6: treaded as min-height*/
+    min-height:100%; /* real browsers */
+    border:1px solid grey;
     border-radius: 4px;
 }
+
 #info{
     border: 1px solid grey;
     min-height: 130px;
@@ -38,7 +53,7 @@ function init() {
     //通过mapTypeId来设置卫星地图样式
         mapTypeId:qq.maps.MapTypeId.LANDFORM,
         center: new qq.maps.LatLng(39.916527,116.397128),
-        zoomLevel:14,
+        zoom:5,
         panControl: false,
         draggableCursor: "crosshair"
     });
@@ -70,13 +85,16 @@ function init() {
                 grade += 5;
             else if (dis <= 200)
                 grade += 2;
-            document.getElementById("distance").innerHTML = "你的答案偏离" + geoArray[count] +　dis + " 千米" ;
-            document.getElementById("grade").innerHTML = "累计获得" + grade + "分";
+            $("#distance").text("你的答案偏离" + geoArray[count] +　dis + " 千米");
+//            document.getElementById("distance").innerHTML = "你的答案偏离" + geoArray[count] +　dis + " 千米" ;
+//            document.getElementById("grade").innerHTML = "累计获得" + grade + "分";
+            $('#grade').text("累计获得" + grade + "分");
             count = count + 1;
             if (count >= geoArray.length)
                 restart();
             else
-                document.getElementById("res").innerHTML = "在地图上点击" + geoArray[count];
+                $("#res").text("在地图上点击" + geoArray[count]);
+//                document.getElementById("res").innerHTML = "在地图上点击" + geoArray[count];
             if (count%10 == 0)
                 alert("你的平均分是" + Math.round(grade*10/count)/10 + "!\nyou are such a smart ass!!" + "\n加油！！");
             clickLoc = [];
@@ -95,7 +113,8 @@ function init() {
             geoArray[len - i -1] = temp;
         }
         count = 0;
-        document.getElementById("res").innerHTML = "在地图上标注" + geoArray[count] + "，然后确认";
+//        document.getElementById("res").innerHTML = "在地图上标注" + geoArray[count] + "，然后确认";
+        $("#res").text("在地图上标注" + geoArray[count] + "，然后确认");
     }
 
     check = function () {
@@ -117,6 +136,10 @@ function init() {
             marker.setMap(null);
         });
     }
+
+//    修改
+    var windowHeight = $(window).height();
+    $("#container").css("minHeight", windowHeight-190);
 }
 
 </script>
@@ -135,7 +158,6 @@ function init() {
         </div>
     </div>
     <div id="container"></div>
-
 </div>
 </body>
 </html>
